@@ -25,7 +25,35 @@
         self.view.backgroundColor = [UIColor colorWithRed:0.921f green:0.929f blue:1.000f alpha:1.000f];
     }
 
-    self.title = [@(stackCount) stringValue];
+    // Bug reproduce step:
+    // 1. Set left & right barButtonItems WITHOUT `title`.
+    // 2. Push a new `ViewController`.
+    // 3. Sloppy-swipe-back, but cancel it (don't pop).
+    // 4. Sloppy-swipe-back to pop.
+    // 5. RootViewController's navigationItem remains on navigationBar.
+    //
+    // NOTE: Bug won't reproduce if...
+    // 1. `leftBarButtonItem` is not set, or
+    // 2. `title` is set
+
+    // Add left & right barButtonItems for non-root viewControllers.
+    if (self.navigationController.viewControllers.count > 1) {
+        UIView* v0 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
+        v0.backgroundColor = UIColor.greenColor;
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:v0];
+
+        UIView* v1 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
+        v1.backgroundColor = UIColor.orangeColor;
+        UIView* v2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
+        v2.backgroundColor = UIColor.cyanColor;
+        self.navigationItem.rightBarButtonItems = @[
+                                                    [[UIBarButtonItem alloc] initWithCustomView:v1],
+                                                    [[UIBarButtonItem alloc] initWithCustomView:v2],
+                                                    ];
+    }
+
+    // NOTE: Intentionally commented-out.
+//    self.title = [@(stackCount) stringValue];
 }
 
 - (void)didReceiveMemoryWarning
